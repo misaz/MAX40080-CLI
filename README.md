@@ -4,8 +4,8 @@ This project contains CLI utility for controlling Maxim Integrated MAX40080 Curr
 # Instalation
 
 ```
-wget ...
-sudo mv max40080_aarch64 
+wget 'https://github.com/misaz/MAX40080-CLI/releases/download/v1.0/max40080_aarch64'
+sudo mv max40080_aarch64 /usr/bin/max40080
 ```
 
 # Basic usage
@@ -49,8 +49,11 @@ max40080 -a 29 -s 0.033
 # Compiling From Sources
 
 ```
-sudo apt install libi2c-dev gcc make
-git clone ...
+sudo apt update
+sudo apt -y install git gcc make libi2c-dev
+git clone https://github.com/misaz/MAX40080-CLI.git
+cd MAX40080-CLI
 make
 make install
+cd -
 ```
