@@ -3,10 +3,21 @@
 #include "MAX40080_PlatformSpecific.h"
 
 #include <stdio.h>
+#include <signal.h>
+#include <errno.h>
 
 CommandLineArguments cliArgs;
 
 float shuntReistorVariable = 0.010;
+
+static int isExitRequested = 0;
+
+void signalHandler(int signalId) {
+	if (signalId == SIGINT) {
+		isExitRequested = 1;
+		signal(SIGINT, SIG_DFL);
+	}
+}
 
 static const char* StatusToString(MAX40080_Status status) {
 	switch (status) {
@@ -127,6 +138,7 @@ static void collectSample(MAX40080_Status (*sampleProvider) ()) {
 
 int main(int argc, char** argv) {
 	int iStatus;
+	sig_t sStatus;
 	MAX40080_Status mStatus;
 
 	iStatus = CommandLineArguments_Parse(&cliArgs, argc, argv);
@@ -151,6 +163,12 @@ int main(int argc, char** argv) {
 	mStatus = MAX40080_Init();
 	if (mStatus) {
 		fprintf(stderr, "Sensor initialization failed. Details: %s\n", StatusToString(mStatus));
+		return 1;
+	}
+	
+	sStatus = signal(SIGINT, signalHandler);
+	if (sStatus == SIG_ERR) {
+		fprintf(stderr, "Error while setting signal handler. Error details: %d\n", errno);
 		return 1;
 	}
 
@@ -215,6 +233,10 @@ int main(int argc, char** argv) {
 
 	int remainingSamples = cliArgs.count;
 	while (remainingSamples > 0 || remainingSamples == -1) {
+		if (isExitRequested) {
+			break;
+		}
+
 		if (!cliArgs.isVariableSet || cliArgs.variable == 'I') {
 			if (cliArgs.isRawOutputSet) {
 				collectSample(collectAndPrintRawCurrent);
