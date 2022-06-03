@@ -186,6 +186,10 @@ int main(int argc, char** argv) {
 		config.digitalFilter = (MAX40080_DigitalFilter)cliArgs.averaging;
 	}
 
+	if (cliArgs.isInputRangeSet && cliArgs.inputRange == 50) {
+		config.inputRange = MAX40080_InputRange_50mV;
+	}
+
 	mStatus = MAX40080_SetConfiguration(&config);
 	if (mStatus) {
 		fprintf(stderr, "Setting sensor configuration failed. Details: %s\n", StatusToString(mStatus));

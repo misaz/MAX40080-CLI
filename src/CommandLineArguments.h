@@ -26,6 +26,9 @@ typedef struct {
 
     float shuntResistor;
     int isShuntResistorSet;
+
+    int inputRange;
+    int isInputRangeSet;
 } CommandLineArguments;
 
 int CommandLineArguments_Parse(CommandLineArguments* output, int argc, char** argv);

@@ -21,16 +21,18 @@ static char args_doc[] = "command";
 #define CLI_AVERAGING_PARAM             'f'
 #define CLI_COUNT_PARAM                 'n'
 #define CLI_OUTPUT_RAW_PARAM            'w'
+#define CLI_INPUT_RANGE_PARAM           'i'
 
 static struct argp_option options[] = {
 	{ "board", CLI_BOARD_SELECTION_PARAM, "BOARD", 0, "Specify board. Supported boards are 'mikroe-current-6-click' and 'MAX40080EVSYS'.", 1},
 	{ "i2c-controler", CLI_I2C_CONTROLLER_PARAM, "N", 0, "Specify I2C controller number. Device /dev/i2c-N will be used where N is value of this parameter", 2},
 	{ "i2c-address", CLI_I2C_ADDRESS_PARAM, "HEX", 0, "Specify I2C address of MAX40080 device. Enter 7-bit address as a 2 digit HEX number with no prefix.", 3},
 	{ "shunt", CLI_SHUNT_PARAM, "FLOAT", 0, "Specify resistance of shunt resistor used for current sensing (float value in ohms).", 4},
-	{ "variable", CLI_VARIABLE_PARAM, "current|voltage|both", 0, "Specify variable to meassure.", 5},
+	{ "variable", CLI_VARIABLE_PARAM, "current|voltage|both", 0, "Specify variable to meassure. Allowed values are current, voltage and both.", 5},
 	{ "sample-rate", CLI_SAMPLE_RATE_PARAM, "FLOAT", 0, "Specify sample rate in kHz.", 6},
 	{ "averaging", CLI_AVERAGING_PARAM, "N", 0, "Specify number of averaged samples.", 7},
-	{ "count", CLI_COUNT_PARAM, "N", 0, "Specify number of continously collected samples.", 8},
+	{ "input-range", CLI_INPUT_RANGE_PARAM, "10|50", 0, "Specify input range in mV. Allowed values are 10 (default) and 50. 50 allows measure 5x higher currents. 10 is more accurate when measuring low currents.", 7},
+	{ "count", CLI_COUNT_PARAM, "N", 0, "Specify number of continously collected samples. Use -1 for samplling indefinitly.", 8},
 	{ "raw", CLI_OUTPUT_RAW_PARAM, NULL, 0, "Output raw values received from sensor.", 9},
 	{ 0 }
 };
@@ -221,6 +223,24 @@ static error_t CommandLineArgumets_ParseOption(int key, char* arg, struct argp_s
 		}
 
 		argp_error(state, "Invalid averaging value. Allowed averaging modes are 1 (no averaging), 8, 16, 32, 64 and 128.");
+	}
+
+	if (key == CLI_INPUT_RANGE_PARAM) {
+		int inputRange;
+		int pos;
+
+		if (sscanf(arg, " %d%n", &inputRange, &pos) != 1 || pos != strlen(arg)) {
+			argp_error(state, "Invalid input range value.");
+		}
+
+		if (inputRange != 50 && inputRange != 10) {
+			argp_error(state, "Invalid input range value. Allowed values are 10 and 50.");
+		}
+
+		cliArgs->inputRange = inputRange;
+		cliArgs->isInputRangeSet = 1;
+
+		return 0;
 	}
 
 	if (key == CLI_COUNT_PARAM) {
