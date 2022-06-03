@@ -111,7 +111,7 @@ static MAX40080_Status collectAndPrintCurrentAndVoltage() {
 
 static void collectSample(MAX40080_Status (*sampleProvider) ()) {
 	MAX40080_Status mStatus;
-	int emptyFifoRetries = 1000;
+	int emptyFifoRetries = 100000;
 
 	while (emptyFifoRetries--) {
 		mStatus = sampleProvider();
@@ -133,7 +133,7 @@ static void collectSample(MAX40080_Status (*sampleProvider) ()) {
 		fprintf(stderr, "WARNING: Collecting sample failed with error. %sError details: %s\n", retryAgainSentense, StatusToString(mStatus));
 	}
 
-	fprintf(stderr, "Collecting sample failed. Giving up.\n");
+	fprintf(stderr, "Collecting sample failed. Giving up. Last error: %s\n", StatusToString(mStatus));
 }
 
 int main(int argc, char** argv) {
