@@ -6,6 +6,7 @@ This project contains CLI utility for controlling Maxim Integrated MAX40080 Curr
 ```
 wget 'https://github.com/misaz/MAX40080-CLI/releases/download/v1.0/max40080_aarch64'
 sudo mv max40080_aarch64 /usr/bin/max40080
+sudo chmod +x /usr/bin/max40080
 ```
 
 # Basic usage
